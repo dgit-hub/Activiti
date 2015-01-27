@@ -2,6 +2,7 @@ package org.activiti.osgi.blueprint;
 
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.Set;
 import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.activiti.engine.cfg.ProcessEngineConfigurator;
 import org.activiti.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
@@ -13,6 +14,7 @@ public class ConfigurationFactory {
     boolean jobExecutorActivate = true;
     List<ProcessEngineConfigurator> configurators;
     ActivityBehaviorFactory activityBehaviorFactory;
+    protected Set<Class<?>> customMybatisMappers;
 
     public StandaloneProcessEngineConfiguration getConfiguration() {
   		StandaloneProcessEngineConfiguration conf =
@@ -21,6 +23,7 @@ public class ConfigurationFactory {
       conf.setDatabaseSchemaUpdate(databaseSchemaUpdate);
       conf.setJobExecutorActivate(jobExecutorActivate);
       conf.setConfigurators(configurators);
+      conf.setCustomMybatisMappers(customMybatisMappers);
       conf.setActivityBehaviorFactory(activityBehaviorFactory);
       return conf;
     }
@@ -44,5 +47,9 @@ public class ConfigurationFactory {
     public void setActivityBehaviorFactory(ActivityBehaviorFactory activityBehaviorFactory)
     {
         this.activityBehaviorFactory = activityBehaviorFactory;
+    }
+
+    public void setCustomMybatisMappers(Set<Class<?>> customMybatisMappers) {
+        this.customMybatisMappers = customMybatisMappers;
     }
 }
