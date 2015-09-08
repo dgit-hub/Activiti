@@ -6,6 +6,7 @@ import java.util.Set;
 import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.activiti.engine.cfg.ProcessEngineConfigurator;
 import org.activiti.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
+import org.activiti.engine.parse.BpmnParseHandler;
 
 public class ConfigurationFactory {
 
@@ -13,6 +14,7 @@ public class ConfigurationFactory {
     String databaseSchemaUpdate;
     boolean jobExecutorActivate = true;
     List<ProcessEngineConfigurator> configurators;
+    List<BpmnParseHandler> customDefaultBpmnParseHandlers;
     ActivityBehaviorFactory activityBehaviorFactory;
     protected Set<Class<?>> customMybatisMappers;
 
@@ -23,6 +25,7 @@ public class ConfigurationFactory {
       conf.setDatabaseSchemaUpdate(databaseSchemaUpdate);
       conf.setJobExecutorActivate(jobExecutorActivate);
       conf.setConfigurators(configurators);
+        conf.setCustomDefaultBpmnParseHandlers(customDefaultBpmnParseHandlers);
       conf.setCustomMybatisMappers(customMybatisMappers);
       conf.setActivityBehaviorFactory(activityBehaviorFactory);
       return conf;
@@ -42,6 +45,10 @@ public class ConfigurationFactory {
 
     public void setConfigurators(List<ProcessEngineConfigurator> configurators) {
       this.configurators = configurators;
+    }
+
+    public void setCustomDefaultBpmnParseHandlers(List<BpmnParseHandler> customDefaultBpmnParseHandlers) {
+        this.customDefaultBpmnParseHandlers = customDefaultBpmnParseHandlers;
     }
 
     public void setActivityBehaviorFactory(ActivityBehaviorFactory activityBehaviorFactory)
