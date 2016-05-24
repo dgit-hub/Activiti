@@ -22,10 +22,11 @@ import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.identity.Group;
-import org.activiti.engine.impl.AbstractQuery.NullHandlingOnOrder;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
+import org.activiti.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.activiti.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.activiti.engine.impl.variable.VariableTypes;
 
 
@@ -123,17 +124,22 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
   public List<HistoricTaskInstance> executeList(CommandContext commandContext, Page page) {
     ensureVariablesInitialized();
     checkQueryOk();
-    if (includeTaskLocalVariables || includeProcessVariables) {
-      return commandContext
-          .getHistoricTaskInstanceEntityManager()
-          .findHistoricTaskInstancesAndVariablesByQueryCriteria(this);
-    } else {
-      return commandContext
-          .getHistoricTaskInstanceEntityManager()
-          .findHistoricTaskInstancesByQueryCriteria(this);
-    }
-  }
 
+    List<HistoricTaskInstance> taskResult = commandContext
+        .getHistoricTaskInstanceEntityManager()
+        .findHistoricTaskInstancesByQueryCriteria(this);
+
+    if (includeTaskLocalVariables || includeProcessVariables) {
+      // Variables will be loaded into the object when calling get() method.
+      for (HistoricTaskInstance task : taskResult) {
+
+        ((HistoricTaskInstanceEntity) task)
+          .setQueryVariables(getVariables(commandContext,task));
+      }
+    }
+
+    return taskResult;
+  }
 
   public HistoricTaskInstanceQueryImpl processInstanceId(String processInstanceId) {
     if (inOrStatement) {
@@ -1096,11 +1102,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
   @Override
   protected void checkQueryOk() {
     super.checkQueryOk();
-    // In case historic query variables are included, an additional order-by clause should be added
-    // to ensure the last value of a variable is used
-    if(includeProcessVariables || includeTaskLocalVariables) {
-    	this.orderBy(HistoricTaskInstanceQueryProperty.INCLUDED_VARIABLE_TIME).asc();
-    }
   }
   
   public String getMssqlOrDB2OrderBy() {
@@ -1137,6 +1138,42 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
       groupIds.add(group.getId());
     }
     return groupIds;
+  }
+
+  public List getVariables(CommandContext commandContext, HistoricTaskInstance task) {
+    List vars = new ArrayList<HistoricVariableInstanceEntity>();
+
+    if (includeProcessVariables) {
+      for (HistoricVariableInstanceEntity var :
+          commandContext
+              .getHistoricVariableInstanceEntityManager()
+              .findVariableInstancesByExecutionId(task.getExecutionId())) {
+
+        if (var.getTaskId() != null) {
+          continue;
+        }
+
+        //Cache value while we have the DB Context
+        var.getValue();
+
+        vars.add(var);
+      }
+    }
+
+    if (includeTaskLocalVariables) {
+      for (HistoricVariableInstanceEntity var :
+        commandContext
+          .getHistoricVariableInstanceEntityManager()
+          .findVariableInstancesByTaskId(task.getId())) {
+
+        //Cache value while we have the DB Context
+        var.getValue();
+
+        vars.add(var);
+      }
+    }
+
+    return vars;
   }
   
   // getters and setters //////////////////////////////////////////////////////

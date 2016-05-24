@@ -120,39 +120,6 @@ public class TaskEntityManager extends AbstractManager {
     final String query = "selectTaskByQueryCriteria";
     return getDbSqlSession().selectList(query, taskQuery);
   }
-  
-  @SuppressWarnings("unchecked")
-  public List<Task> findTasksAndVariablesByQueryCriteria(TaskQueryImpl taskQuery) {
-    final String query = "selectTaskWithVariablesByQueryCriteria";
-    // paging doesn't work for combining task instances and variables due to an outer join, so doing it in-memory
-    if (taskQuery.getFirstResult() < 0 || taskQuery.getMaxResults() <= 0) {
-      return Collections.EMPTY_LIST;
-    }
-    
-    int firstResult = taskQuery.getFirstResult();
-    int maxResults = taskQuery.getMaxResults();
-    
-    // setting max results, limit to 20000 results for performance reasons
-    taskQuery.setMaxResults(20000);
-    taskQuery.setFirstResult(0);
-    
-    List<Task> instanceList = getDbSqlSession().selectListWithRawParameterWithoutFilter(query, taskQuery, taskQuery.getFirstResult(), taskQuery.getMaxResults());
-    
-    if (instanceList != null && !instanceList.isEmpty()) {
-      if (firstResult > 0) {
-        if (firstResult <= instanceList.size()) {
-          int toIndex = firstResult + Math.min(maxResults, instanceList.size() - firstResult);
-          return instanceList.subList(firstResult, toIndex);
-        } else {
-          return Collections.EMPTY_LIST;
-        }
-      } else {
-        int toIndex = Math.min(maxResults, instanceList.size());
-        return instanceList.subList(0, toIndex);
-      }
-    }
-    return Collections.EMPTY_LIST;
-  }
 
   public long findTaskCountByQueryCriteria(TaskQueryImpl taskQuery) {
     return (Long) getDbSqlSession().selectOne("selectTaskCountByQueryCriteria", taskQuery);

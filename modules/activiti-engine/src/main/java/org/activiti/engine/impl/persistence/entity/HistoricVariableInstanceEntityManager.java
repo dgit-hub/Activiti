@@ -85,4 +85,16 @@ public class HistoricVariableInstanceEntityManager extends AbstractManager {
   public long findHistoricVariableInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
     return (Long) getDbSqlSession().selectOne("selectHistoricVariableInstanceCountByNativeQuery", parameterMap);
   }
+
+  @SuppressWarnings("unchecked")
+  public List<HistoricVariableInstanceEntity> findVariableInstancesByTaskId(String taskId) {
+    return getDbSqlSession().selectList("selectHistoricVariableInstancesByTaskId", taskId);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<HistoricVariableInstanceEntity> findVariableInstancesByExecutionId(String executionId) {
+    return getDbSqlSession().selectList("selectHistoricVariableInstancesByExecutionId", executionId);
+  }
+
+
 }

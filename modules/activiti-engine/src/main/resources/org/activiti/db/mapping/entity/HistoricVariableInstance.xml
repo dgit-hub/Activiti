@@ -209,5 +209,20 @@
   <select id="selectHistoricVariableInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">
     ${sql}
   </select>
-  
+
+  <select id="selectHistoricVariableInstancesByTaskId"
+          parameterType="org.activiti.engine.impl.db.ListQueryParameterObject"
+          resultMap="historicProcessVariableResultMap">
+    select * from ${prefix}ACT_HI_VARINST where
+    TASK_ID_ =
+    #{parameter, jdbcType=VARCHAR}
+</select>
+
+  <select id="selectHistoricVariableInstancesByExecutionId"
+          parameterType="org.activiti.engine.impl.db.ListQueryParameterObject"
+          resultMap="historicProcessVariableResultMap">
+    select * from ${prefix}ACT_HI_VARINST where
+    EXECUTION_ID_ =
+    #{parameter, jdbcType=VARCHAR}
+  </select>
 </mapper>

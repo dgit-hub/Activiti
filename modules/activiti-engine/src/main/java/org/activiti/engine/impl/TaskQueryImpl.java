@@ -23,6 +23,8 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.SuspensionState;
+import org.activiti.engine.impl.persistence.entity.TaskEntity;
+import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.activiti.engine.impl.variable.VariableTypes;
 import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.Task;
@@ -1135,15 +1137,18 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
   public List<Task> executeList(CommandContext commandContext, Page page) {
     ensureVariablesInitialized();
     checkQueryOk();
+
+    List<Task> taskResult = commandContext
+      .getTaskEntityManager()
+      .findTasksByQueryCriteria(this);
+
     if (includeTaskLocalVariables || includeProcessVariables) {
-      return commandContext
-          .getTaskEntityManager()
-          .findTasksAndVariablesByQueryCriteria(this);
-    } else {
-      return commandContext
-          .getTaskEntityManager()
-          .findTasksByQueryCriteria(this);
+      for (Task task : taskResult) {
+        ((TaskEntity) task).setQueryVariables(getVariables(commandContext, task));
+      }
     }
+
+    return taskResult;
   }
   
   public long executeCount(CommandContext commandContext) {
@@ -1152,6 +1157,42 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     return commandContext
       .getTaskEntityManager()
       .findTaskCountByQueryCriteria(this);
+  }
+
+  private List<VariableInstanceEntity> getVariables(CommandContext commandContext, Task task) {
+    List vars = new ArrayList<VariableInstanceEntity>();
+
+    if (includeProcessVariables) {
+      for (VariableInstanceEntity var :
+        commandContext
+          .getVariableInstanceEntityManager()
+          .findVariableInstancesByExecutionId(task.getExecutionId())) {
+
+        if (var.getTaskId() != null) {
+          continue;
+        }
+
+        //Cache value while we have the DB Context
+        var.getValue();
+
+        vars.add(var);
+      }
+    }
+
+    if (includeTaskLocalVariables) {
+      for (VariableInstanceEntity var :
+        commandContext
+          .getVariableInstanceEntityManager()
+          .findVariableInstancesByTaskId(task.getId())) {
+
+        //Cache value while we have the DB Context
+        var.getValue();
+
+        vars.add(var);
+      }
+    }
+
+    return vars;
   }
   
   //getters ////////////////////////////////////////////////////////////////
