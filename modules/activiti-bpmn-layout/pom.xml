@@ -15,7 +15,7 @@
 
   <properties>
     <activiti.artifact>
-      org.activiti.bpmn.layout
+      org.activiti.bpmn
     </activiti.artifact>
   </properties>
 
