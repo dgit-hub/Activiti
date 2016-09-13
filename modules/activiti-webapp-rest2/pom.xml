@@ -15,97 +15,52 @@
   
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.zeroturnaround</groupId>
-        <artifactId>jrebel-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate-rebel-xml</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-	    <groupId>org.apache.tomcat.maven</groupId>
-        <artifactId>tomcat7-maven-plugin</artifactId>
-		<configuration>
-		  <port>8080</port>
-		  <path>/activiti-rest</path>
-		  <systemProperties>
-		    <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
-          </systemProperties>
-		</configuration>
-      </plugin>
-    </plugins>
-    <pluginManagement>
-      <plugins>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
         <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>
-                      org.zeroturnaround
-                    </groupId>
-                    <artifactId>
-                      jrebel-maven-plugin
-                    </artifactId>
-                    <versionRange>
-                      [1.0.7,)
-                    </versionRange>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>maven-bundle-plugin</artifactId>
+            <extensions>true</extensions>
+            <executions>
+                <execution>
+                    <id>bundle-manifest</id>
+                    <phase>process-classes</phase>
                     <goals>
-                      <goal>generate</goal>
+                        <goal>manifest</goal>
                     </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore></ignore>
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
+                </execution>
+            </executions>
+            <configuration>
+                <supportedProjectTypes>
+                  <supportedProjectType>jar</supportedProjectType>
+                  <supportedProjectType>bundle</supportedProjectType>
+                  <supportedProjectType>war</supportedProjectType>
+                </supportedProjectTypes>
 
-  <profiles>
-    <profile>
-	  <id>buildExecutableWar</id>
-	    <build>
-		  <plugins>
-            <plugin>
-              <groupId>org.apache.tomcat.maven</groupId>
-			  <artifactId>tomcat7-maven-plugin</artifactId>
-			  <version>2.1</version>
-			  <configuration>
-			    <path>/</path>
-			  </configuration>
-			  <executions>
-			    <execution>
-				  <id>tomcat-run</id>
-				  <goals>
-				    <goal>exec-war-only</goal>
-				  </goals>
-				  <phase>package</phase>
-				  <configuration>
-                    <path>/activiti-rest</path>
-                  </configuration>
-				</execution>
-			  </executions>
-			</plugin>
-		  </plugins>
-	  </build>
-    </profile>
-  </profiles>
+                <manifestLocation>./src/main/webapp/META-INF</manifestLocation>
+
+                <instructions>
+                  <Export-Package>*</Export-Package>
+                  <Bundle-Name>Activiti REST WAB Application</Bundle-Name>
+                  <Web-ContextPath>/rest</Web-ContextPath>
+                  <DynamicImport-Package>*</DynamicImport-Package>
+                  <Service-Component>WEB-INF/web.xml</Service-Component>
+                  <Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
+                </instructions>
+              <manifestLocation>${project.build.directory}/META-INF</manifestLocation>
+            </configuration>
+        </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.1.1</version>
+        <configuration>
+          <archive>
+            <manifestFile>${project.build.directory}/META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
+   </plugins>
+  </build>
   
   <dependencies>
     <dependency>
