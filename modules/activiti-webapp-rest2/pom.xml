@@ -38,10 +38,11 @@
                 <manifestLocation>./src/main/webapp/META-INF</manifestLocation>
 
                 <instructions>
+                  <Import-Package>*</Import-Package>
                   <Export-Package>*</Export-Package>
                   <Bundle-Name>Activiti REST WAB Application</Bundle-Name>
                   <Web-ContextPath>/rest</Web-ContextPath>
-                  <DynamicImport-Package>*</DynamicImport-Package>
+                  <!-- <DynamicImport-Package>*</DynamicImport-Package> -->
                   <Service-Component>WEB-INF/web.xml</Service-Component>
                   <Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
                 </instructions>
