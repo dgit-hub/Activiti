@@ -38,7 +38,7 @@
                 <manifestLocation>./src/main/webapp/META-INF</manifestLocation>
 
                 <instructions>
-                  <Import-Package>*</Import-Package>
+                  <Import-Package>!*</Import-Package>
                   <Export-Package>*</Export-Package>
                   <Bundle-Name>Activiti REST WAB Application</Bundle-Name>
                   <Web-ContextPath>/rest</Web-ContextPath>
@@ -91,8 +91,7 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <version>3.0.1</version>
-      <scope>system</scope>
+      <version>3.1.0</version>
     </dependency>
   </dependencies>
 </project>
