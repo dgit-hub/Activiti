@@ -20,4 +20,18 @@
     <listener>
         <listener-class>org.activiti.rest.servlet.WebConfigurer</listener-class>
     </listener>
+    
+    <servlet>
+	    <servlet-name>RestletServlet</servlet-name>
+	    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	    <init-param>
+	      <param-name>contextClass</param-name>
+	      <param-value>org.springframework.osgi.web.context.support.OsgiBundleXmlWebApplicationContext</param-value>
+	    </init-param>
+ 	</servlet>
+ 	
+ 	<servlet-mapping>  
+	    <servlet-name>RestletServlet</servlet-name>  
+	    <url-pattern>/service/*</url-pattern>  
+	</servlet-mapping> 
 </web-app>

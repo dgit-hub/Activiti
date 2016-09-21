@@ -38,7 +38,10 @@
                 <manifestLocation>./src/main/webapp/META-INF</manifestLocation>
 
                 <instructions>
-                  <Import-Package>*</Import-Package>
+                  <Import-Package>
+                  org.springframework.osgi.web.context.support; version="[1.2,2.0)",
+                  *
+                  </Import-Package>
                   <Export-Package>*</Export-Package>
                   <Bundle-Name>Activiti REST WAB Application</Bundle-Name>
                   <Web-ContextPath>/rest</Web-ContextPath>
@@ -100,5 +103,11 @@
       <version>3.0.1</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>spring-osgi-web</artifactId>
+      <version>1.2.1</version>
+      <scope>provided</scope>
+	</dependency>
   </dependencies>
 </project>
