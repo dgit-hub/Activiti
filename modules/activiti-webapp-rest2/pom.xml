@@ -59,7 +59,12 @@
                   <Web-ContextPath>/rest</Web-ContextPath>
                   <!-- <DynamicImport-Package>*</DynamicImport-Package> -->
                   <Service-Component>WEB-INF/web.xml</Service-Component>
-                  <Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
+                  <Bundle-ClassPath>
+                  .,
+                  WEB-INF/classes,
+                  WEB-INF/classes/org/activiti/rest/conf,
+                  WEB-INF/classes/org/activiti/rest/servlet,
+                  WEB-INF/classes/org/activiti/rest/images</Bundle-ClassPath>
                 </instructions>
               <manifestLocation>${project.build.directory}/META-INF</manifestLocation>
             </configuration>
