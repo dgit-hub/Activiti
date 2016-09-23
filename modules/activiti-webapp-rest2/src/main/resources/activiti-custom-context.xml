@@ -8,7 +8,15 @@
        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd
        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
        
-	<bean id="dbProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <context:annotation-config />
+    <bean id="activitiEngineConfiguration" class="org.activiti.rest.conf.ActivitiEngineConfiguration"/>
+    <bean id="applicationConfiguration" class="org.activiti.rest.conf.ApplicationConfiguration"/>
+    <bean id="demoDataConfiguration" class="org.activiti.rest.conf.DemoDataConfiguration"/>
+    <bean id="jacksonConfiguration" class="org.activiti.rest.conf.JacksonConfiguration"/>
+    <bean id="restConfiguration" class="org.activiti.rest.conf.RestConfiguration"/>
+    <bean id="securityConfiguration" class="org.activiti.rest.conf.SecurityConfiguration"/>
+       
+	<!-- <bean id="dbProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 	    <property name="locations">
             <list>
                 <value>classpath:db.properties</value>
@@ -58,6 +66,6 @@
     <bean id="formService" factory-bean="processEngine" factory-method="getFormService" />
     <bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService" />
     <bean id="managementService" factory-bean="processEngine" factory-method="getManagementService" />
-    <bean id="identityService" factory-bean="processEngine" factory-method="getIdentityService" />
+    <bean id="identityService" factory-bean="processEngine" factory-method="getIdentityService" /> -->
   
 </beans>

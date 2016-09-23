@@ -9,7 +9,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRegistration;
 
-import org.activiti.rest.conf.ApplicationConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
@@ -41,7 +40,7 @@ public class WebConfigurer implements ServletContextListener {
 
     if (context == null) {
         rootContext = new AnnotationConfigWebApplicationContext();
-        rootContext.register(ApplicationConfiguration.class);
+        rootContext.register(org.activiti.rest.conf.ApplicationConfiguration.class);
         rootContext.refresh();
     } else {
         rootContext = context;
