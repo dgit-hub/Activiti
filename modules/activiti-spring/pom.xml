@@ -9,7 +9,7 @@
         <groupId>org.activiti</groupId>
         <artifactId>activiti-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>5.16.3</version>
+        <version>5.21.0</version>
     </parent>
 
     <properties>
@@ -109,10 +109,7 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
         </dependency>
-       <!-- <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-        </dependency>-->
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
@@ -289,13 +286,12 @@
                                 <exclude>**/*TestCase.java</exclude>
                                 <exclude>**/ActivitiRuleJunit4Test.java</exclude><!-- Can't run in
 									Spring since ActivitiRule must be used different in Spring -->
-                                <exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-234 -->
-                                <exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
-                                <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
-                                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
+                                <exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-234 -->
+                                <exclude>**/WSDLImporterTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-315 -->
+                                <exclude>**/JobExecutorTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-427 -->
+                                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-485 -->
                             </excludes>
                             <runOrder>alphabetical</runOrder>
-                            <argLine>-Duser.language=en</argLine>
                         </configuration>
                     </plugin>
                 </plugins>

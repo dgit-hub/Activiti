@@ -15,7 +15,9 @@ package org.activiti.engine.delegate.event.impl;
 import java.util.Map;
 
 import org.activiti.engine.delegate.DelegateExecution;
+import org.activiti.engine.delegate.event.ActivitiActivityCancelledEvent;
 import org.activiti.engine.delegate.event.ActivitiActivityEvent;
+import org.activiti.engine.delegate.event.ActivitiCancelledEvent;
 import org.activiti.engine.delegate.event.ActivitiEntityEvent;
 import org.activiti.engine.delegate.event.ActivitiEntityWithVariablesEvent;
 import org.activiti.engine.delegate.event.ActivitiErrorEvent;
@@ -24,6 +26,7 @@ import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.delegate.event.ActivitiExceptionEvent;
 import org.activiti.engine.delegate.event.ActivitiMembershipEvent;
 import org.activiti.engine.delegate.event.ActivitiMessageEvent;
+import org.activiti.engine.delegate.event.ActivitiProcessStartedEvent;
 import org.activiti.engine.delegate.event.ActivitiSequenceFlowTakenEvent;
 import org.activiti.engine.delegate.event.ActivitiSignalEvent;
 import org.activiti.engine.delegate.event.ActivitiVariableEvent;
@@ -73,6 +76,24 @@ public class ActivitiEventBuilder {
 		populateEventWithCurrentContext(newEvent);
 		return newEvent;
 	}
+
+  /**
+   * @param entity
+   *            the entity this event targets
+   * @param variables
+   *            the variables associated with this entity
+   * @return an {@link ActivitiEntityEvent}. In case an {@link ExecutionContext} is active, the execution related
+   *         event fields will be populated. If not, execution details will be reteived from the {@link Object} if
+   *         possible.
+   */
+  @SuppressWarnings("rawtypes")
+  public static ActivitiProcessStartedEvent createProcessStartedEvent(final Object entity, final Map variables, final boolean localScope) {
+    final ActivitiProcessStartedEventImpl newEvent = new ActivitiProcessStartedEventImpl(entity, variables, localScope);
+
+    // In case an execution-context is active, populate the event fields related to the execution
+    populateEventWithCurrentContext(newEvent);
+    return newEvent;
+  }
 	
 	/**
    * @param type type of event
@@ -168,8 +189,32 @@ public class ActivitiEventBuilder {
 		newEvent.setBehaviorClass(behaviourClass);
 		return newEvent;
 	}
-	
-	public static ActivitiSignalEvent createSignalEvent(ActivitiEventType type, String activityId, String signalName, Object signalData, 
+
+  public static ActivitiActivityCancelledEvent createActivityCancelledEvent(String activityId, String activityName,
+                                                          String executionId, String processInstanceId, String processDefinitionId, String activityType, String behaviourClass, Object cause) {
+    ActivitiActivityCancelledEventImpl newEvent = new ActivitiActivityCancelledEventImpl();
+    newEvent.setActivityId(activityId);
+    newEvent.setActivityName(activityName);
+    newEvent.setExecutionId(executionId);
+    newEvent.setProcessDefinitionId(processDefinitionId);
+    newEvent.setProcessInstanceId(processInstanceId);
+    newEvent.setActivityType(activityType);
+    newEvent.setBehaviorClass(behaviourClass);
+    newEvent.setCause(cause);
+    return newEvent;
+  }
+
+	public static ActivitiCancelledEvent createCancelledEvent(String executionId, String processInstanceId,
+	                                                          String processDefinitionId, Object cause) {
+		ActivitiProcessCancelledEventImpl newEvent = new ActivitiProcessCancelledEventImpl();
+		newEvent.setExecutionId(executionId);
+		newEvent.setProcessDefinitionId(processDefinitionId);
+		newEvent.setProcessInstanceId(processInstanceId);
+		newEvent.setCause(cause);
+		return newEvent;
+	}
+
+	public static ActivitiSignalEvent createSignalEvent(ActivitiEventType type, String activityId, String signalName, Object signalData,
 			String executionId, String processInstanceId, String processDefinitionId) {
 		ActivitiSignalEventImpl newEvent = new ActivitiSignalEventImpl(type);
 		newEvent.setActivityId(activityId);

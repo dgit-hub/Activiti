@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.activiti.engine.EngineServices;
 import org.activiti.engine.impl.context.Context;
+import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.PvmException;
 import org.activiti.engine.impl.pvm.PvmExecution;
@@ -201,7 +202,8 @@ public class ExecutionImpl implements
       }
     }
   }
-  
+
+  @Override
   public void destroyScope(String reason) {
     
    log.debug("performing destroy scope behavior for execution {}", this);
@@ -223,6 +225,16 @@ public class ExecutionImpl implements
   public ExecutionImpl getParent() {
     ensureParentInitialized();
     return parent;
+  }
+  
+  @Override
+  public String getSuperExecutionId() {
+    ensureActivityInitialized();
+    if (superExecution != null) {
+      return superExecution.getId();
+    }
+    
+    return null;
   }
   
   public String getParentId() {
@@ -617,13 +629,33 @@ public class ExecutionImpl implements
     // Variable is nowhere to be found
     return null;
   }
-
+  
+  @Override
+  public Object getVariable(String variableName, boolean fetchAllVariables) {
+  	return getVariable(variableName); // No support for fetchAllVariables on ExecutionImpl
+  }
+  
   public Map<String, Object> getVariables() {
     Map<String, Object> collectedVariables = new HashMap<String, Object>();
     collectVariables(collectedVariables);
     return collectedVariables;
   }
   
+  @Override
+  public Map<String, Object> getVariables(Collection<String> variableNames) {
+  	Map<String, Object> allVariables = getVariables();
+  	Map<String, Object> filteredVariables = new HashMap<String, Object>();
+  	for (String variableName : variableNames) {
+  		filteredVariables.put(variableName, allVariables.get(variableName));
+  	}
+  	return filteredVariables;
+  }
+  
+  @Override
+  public Map<String, Object> getVariables(Collection<String> variableNames, boolean fetchAllVariables) {
+  	return getVariables(variableNames); // No support for the boolean param
+  }
+
   protected void collectVariables(Map<String, Object> collectedVariables) {
     ensureParentInitialized();
     if (parent!=null) {
@@ -658,9 +690,20 @@ public class ExecutionImpl implements
     }
   }
 
+  
+  @Override
+  public void setVariable(String variableName, Object value, boolean fetchAllVariables) {
+  	setVariable(variableName, value);
+  }
+  
   public void setVariableLocally(String variableName, Object value) {
     log.debug("setting variable '{}' to value '{}' on {}", variableName, value, this);
     variables.put(variableName, value);
+  }
+  
+  @Override
+  public Object setVariableLocal(String variableName, Object value, boolean fetchAllVariables) {
+  	return setVariableLocal(variableName, value);
   }
   
   public boolean hasVariable(String variableName) {
@@ -747,6 +790,10 @@ public class ExecutionImpl implements
   public boolean isEnded() {
     return isEnded;
   }
+  @Override
+  public void setEnded(boolean ended) {
+  	this.isEnded = ended;
+  }
   public void setProcessDefinition(ProcessDefinitionImpl processDefinition) {
     this.processDefinition = processDefinition;
   }
@@ -797,6 +844,37 @@ public class ExecutionImpl implements
     return currentActivityName;
   }
 
+  public Map<String, VariableInstance> getVariableInstances() {
+    return null;
+  }
+  
+  public Map<String, VariableInstance> getVariableInstances(Collection<String> variableNames) {
+    return null;
+  }
+
+  public Map<String, VariableInstance> getVariableInstances(Collection<String> variableNames, boolean fetchAllVariables) {
+    return null;
+  }
+
+  public Map<String, VariableInstance> getVariableInstancesLocal() {
+    return null;
+  }
+
+  public Map<String, VariableInstance> getVariableInstancesLocal(Collection<String> variableNames) {
+    return null;
+  }
+
+  public Map<String, VariableInstance> getVariableInstancesLocal(Collection<String> variableNames, boolean fetchAllVariables) {
+    return null;
+  }
+
+  public VariableInstance getVariableInstance(String variableName) {
+    return null;
+  }
+
+  public VariableInstance getVariableInstance(String variableName, boolean fetchAllVariables) {
+    return null;
+  }
 
   public void createVariableLocal(String variableName, Object value) {
   }
@@ -807,16 +885,29 @@ public class ExecutionImpl implements
   public Object getVariableLocal(String variableName) {
     return null;
   }
+  
+  public VariableInstance getVariableInstanceLocal(String variableName) {
+    return null;
+  }
+  
+  @Override
+  public Object getVariableLocal(String variableName, boolean fetchAllVariables) {
+  	return getVariableLocal(variableName); // No support for fetchAllVariables
+  }
+  
+  public VariableInstance getVariableInstanceLocal(String variableName, boolean fetchAllVariables) {
+    return null;
+  }
 
-    @Override
-    public <T> T getVariable(String variableName, Class<T> variableClass) {
-        return variableClass.cast(getVariable(variableName));
-    }
+  @Override
+  public <T> T getVariable(String variableName, Class<T> variableClass) {
+      return variableClass.cast(getVariable(variableName));
+  }
 
-    @Override
-    public <T> T getVariableLocal(String variableName, Class<T> variableClass) {
-        return variableClass.cast(getVariableLocal(variableName));
-    }
+  @Override
+  public <T> T getVariableLocal(String variableName, Class<T> variableClass) {
+      return variableClass.cast(getVariableLocal(variableName));
+  }
 
   public Set<String> getVariableNames() {
     return null;
@@ -828,6 +919,17 @@ public class ExecutionImpl implements
 
   public Map<String, Object> getVariablesLocal() {
     return null;
+  }
+  
+  
+  @Override
+  public Map<String, Object> getVariablesLocal(Collection<String> variableNames) {
+  	return null;
+  }
+  
+  @Override
+  public Map<String, Object> getVariablesLocal(Collection<String> variableNames, boolean fetchAllVariables) {
+  	return null;
   }
 
   public boolean hasVariableLocal(String variableName) {

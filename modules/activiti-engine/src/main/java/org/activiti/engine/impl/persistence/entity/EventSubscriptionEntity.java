@@ -14,10 +14,13 @@
 package org.activiti.engine.impl.persistence.entity;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.db.HasRevision;
 import org.activiti.engine.impl.db.PersistentObject;
@@ -62,6 +65,7 @@ public abstract class EventSubscriptionEntity implements PersistentObject, HasRe
     setExecution(executionEntity);
     setActivity(execution.getActivity());
     this.processInstanceId = executionEntity.getProcessInstanceId();
+    this.processDefinitionId = executionEntity.getProcessDefinitionId();
   }
   
   // processing /////////////////////////////
@@ -90,6 +94,12 @@ public abstract class EventSubscriptionEntity implements PersistentObject, HasRe
     message.setJobHandlerType(ProcessEventJobHandler.TYPE);
     message.setJobHandlerConfiguration(id);
     message.setTenantId(getTenantId());
+    
+    GregorianCalendar expireCal = new GregorianCalendar();
+    ProcessEngineConfiguration processEngineConfig = Context.getCommandContext().getProcessEngineConfiguration();
+    expireCal.setTime(processEngineConfig.getClock().getCurrentTime());
+    expireCal.add(Calendar.SECOND, processEngineConfig.getLockTimeAsyncJobWaitTime());
+    message.setLockExpirationTime(expireCal.getTime());
 
     // TODO: support payload
 //    if(payload != null) {
@@ -137,6 +147,7 @@ public abstract class EventSubscriptionEntity implements PersistentObject, HasRe
     HashMap<String, Object> persistentState = new HashMap<String, Object>();
     persistentState.put("executionId", executionId);
     persistentState.put("configuration", configuration);
+    persistentState.put("processDefinitionId", processDefinitionId);
     return persistentState;
   }
   
@@ -259,8 +270,8 @@ public abstract class EventSubscriptionEntity implements PersistentObject, HasRe
 	public void setProcessDefinitionId(String processDefinitionId) {
 		this.processDefinitionId = processDefinitionId;
 	}
-
-	public String getTenantId() {
+	
+  public String getTenantId() {
 		return tenantId;
 	}
 

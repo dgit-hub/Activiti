@@ -72,12 +72,14 @@ public abstract class JobEntity implements Job, PersistentObject, HasRevision, B
   protected String exceptionMessage;
   
   protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
+  protected String jobType;
 
   public void execute(CommandContext commandContext) {
     ExecutionEntity execution = null;
     if (executionId != null) {
       execution = commandContext.getExecutionEntityManager().findExecutionById(executionId);
     }
+    
     Map<String, JobHandler> jobHandlers = Context.getProcessEngineConfiguration().getJobHandlers();
     JobHandler jobHandler = jobHandlers.get(jobHandlerType);
     jobHandler.execute(this, jobHandlerConfiguration, execution, commandContext);
@@ -116,7 +118,7 @@ public abstract class JobEntity implements Job, PersistentObject, HasRevision, B
 
     // Also delete the job's exception byte array
     exceptionByteArrayRef.delete();
-    
+
     // remove link to execution
     if (executionId != null) {
       ExecutionEntity execution = Context.getCommandContext()
@@ -124,7 +126,7 @@ public abstract class JobEntity implements Job, PersistentObject, HasRevision, B
         .findExecutionById(executionId);
       execution.removeJob(this);
     }
-    
+
     if(Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
     	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
     			ActivitiEventBuilder.createEntityEvent(ActivitiEventType.ENTITY_DELETED, this));
@@ -259,6 +261,12 @@ public abstract class JobEntity implements Job, PersistentObject, HasRevision, B
   }
   public void setExceptionMessage(String exceptionMessage) {
     this.exceptionMessage = StringUtils.abbreviate(exceptionMessage, MAX_EXCEPTION_MESSAGE_LENGTH);
+  }
+  public String getJobType() {
+    return jobType;
+  }
+  public void setJobType(String jobType) {
+    this.jobType = jobType;
   }
   public String getTenantId() {
 		return tenantId;

@@ -17,18 +17,53 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import org.activiti.engine.impl.persistence.entity.VariableInstance;
+
 /**
  * @author Tom Baeyens
+ * @author Joram Barrez
  */
 public interface VariableScope {
 
   Map<String, Object> getVariables();
+  
+  Map<String, VariableInstance> getVariableInstances();
+  
+  Map<String, Object> getVariables(Collection<String> variableNames);
+  
+  Map<String, VariableInstance> getVariableInstances(Collection<String> variableNames);
+  
+  Map<String, Object> getVariables(Collection<String> variableNames, boolean fetchAllVariables);
+  
+  Map<String, VariableInstance> getVariableInstances(Collection<String> variableNames, boolean fetchAllVariables);
 
   Map<String, Object> getVariablesLocal();
-
+  
+  Map<String, VariableInstance> getVariableInstancesLocal();
+  
+  Map<String, Object> getVariablesLocal(Collection<String> variableNames);
+  
+  Map<String, VariableInstance> getVariableInstancesLocal(Collection<String> variableNames);
+  
+  Map<String, Object> getVariablesLocal(Collection<String> variableNames, boolean fetchAllVariables);
+  
+  Map<String, VariableInstance> getVariableInstancesLocal(Collection<String> variableNames, boolean fetchAllVariables);
+  
   Object getVariable(String variableName);
+  
+  VariableInstance getVariableInstance(String variableName);
+  
+  Object getVariable(String variableName, boolean fetchAllVariables);
+  
+  VariableInstance getVariableInstance(String variableName, boolean fetchAllVariables);
 
   Object getVariableLocal(String variableName);
+  
+  VariableInstance getVariableInstanceLocal(String variableName);
+  
+  Object getVariableLocal(String variableName, boolean fetchAllVariables);
+  
+  VariableInstance getVariableInstanceLocal(String variableName, boolean fetchAllVariables);
 
   <T> T getVariable(String variableName, Class<T> variableClass);
 
@@ -66,8 +101,12 @@ public interface VariableScope {
    *          the value of the variable to be set
    */
   void setVariable(String variableName, Object value);
+  
+  void setVariable(String variableName, Object value, boolean fetchAllVariables);
 
   Object setVariableLocal(String variableName, Object value);
+  
+  Object setVariableLocal(String variableName, Object value, boolean fetchAllVariables);
 
   /**
    * Sets the provided variables to the variable scope.
@@ -83,9 +122,9 @@ public interface VariableScope {
    *          a map of keys and values for the variables to be set
    */
   void setVariables(Map<String, ? extends Object> variables);
-
+  
   void setVariablesLocal(Map<String, ? extends Object> variables);
-
+  
   boolean hasVariables();
 
   boolean hasVariablesLocal();

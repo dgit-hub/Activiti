@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author martin.grofcik
  */
-public class SimulationAcquireJobsRunnable extends AcquireJobsRunnable {
+public class SimulationAcquireJobsRunnable extends AcquireJobsRunnableImpl {
 	
 	private static Logger log = LoggerFactory.getLogger(SimulationAcquireJobsRunnable.class.getName());
 
@@ -81,7 +81,7 @@ public class SimulationAcquireJobsRunnable extends AcquireJobsRunnable {
 		        }
 
 		      } catch (ActivitiOptimisticLockingException optimisticLockingException) { 
-		        // See http://jira.codehaus.org/browse/ACT-1390
+		        // See https://activiti.atlassian.net/browse/ACT-1390
 		        log.trace("Optimistic locking exception during job acquisition. If you have multiple job executors running against the same database, " +
 		          		"this exception means that this thread tried to acquire a job, which already was acquired by another job executor acquisition thread." +
 		          		"This is expected behavior in a clustered environment. " +

@@ -18,9 +18,6 @@ import java.util.Map;
 
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.db.BulkDeleteable;
-import org.activiti.engine.impl.db.HasRevision;
-import org.activiti.engine.impl.db.PersistentObject;
-import org.activiti.engine.impl.variable.ValueFields;
 import org.activiti.engine.impl.variable.VariableType;
 import org.apache.commons.lang3.StringUtils;
 
@@ -28,7 +25,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author Tom Baeyens
  * @author Marcus Klimstra (CGI)
  */
-public class VariableInstanceEntity implements ValueFields, PersistentObject, HasRevision, BulkDeleteable, Serializable {
+public class VariableInstanceEntity implements VariableInstance, BulkDeleteable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -36,7 +33,10 @@ public class VariableInstanceEntity implements ValueFields, PersistentObject, Ha
   protected int revision;
 
   protected String name;
+  protected String localizedName;
+  protected String localizedDescription;
   protected VariableType type;
+  protected String typeName;
 
   protected String processInstanceId;
   protected String executionId;
@@ -56,13 +56,6 @@ public class VariableInstanceEntity implements ValueFields, PersistentObject, Ha
   protected VariableInstanceEntity() {
   }
   
-  public static void touch(VariableInstanceEntity variableInstance) {
-	  Context.getCommandContext()
-      .getDbSqlSession()
-      .touch(variableInstance);
-	  
-  }
-  
   public static VariableInstanceEntity createAndInsert(String name, VariableType type, Object value) {
     VariableInstanceEntity variableInstance = create(name, type, value);
 
@@ -77,6 +70,7 @@ public class VariableInstanceEntity implements ValueFields, PersistentObject, Ha
     VariableInstanceEntity variableInstance = new VariableInstanceEntity();
     variableInstance.name = name;
     variableInstance.type = type;
+    variableInstance.typeName = type.getTypeName();
     variableInstance.setValue(value);
     return variableInstance;
   }
@@ -182,6 +176,7 @@ public class VariableInstanceEntity implements ValueFields, PersistentObject, Ha
 
   public void setValue(Object value) {
     type.setValue(value, this);
+    typeName = type.getTypeName();
     cachedValue = value;
   }
 
@@ -203,6 +198,33 @@ public class VariableInstanceEntity implements ValueFields, PersistentObject, Ha
 
   public String getName() {
     return name;
+  }
+  
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getLocalizedName() {
+    return localizedName;
+  }
+
+  public void setLocalizedName(String localizedName) {
+    this.localizedName = localizedName;
+  }
+
+  public String getLocalizedDescription() {
+    return localizedDescription;
+  }
+
+  public void setLocalizedDescription(String localizedDescription) {
+    this.localizedDescription = localizedDescription;
+  }
+  
+  public String getTypeName() {
+    return typeName;
+  }
+  public void setTypeName(String typeName) {
+    this.typeName = typeName;
   }
 
   public VariableType getType() {

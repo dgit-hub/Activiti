@@ -59,7 +59,7 @@ public class DefaultProcessValidatorTest {
 	  Assert.assertNotNull(bpmnModel);
 		
 		List<ValidationError> allErrors = processValidator.validate(bpmnModel);
-		Assert.assertEquals(66, allErrors.size());
+		Assert.assertEquals(65, allErrors.size());
 		
 		String setName = ValidatorSetNames.ACTIVITI_EXECUTABLE_PROCESS; // shortening it a bit
 		
@@ -99,10 +99,9 @@ public class DefaultProcessValidatorTest {
 		assertCommonErrorFields(problems.get(0));
 		
 		// Start event
-		problems = findErrors(allErrors, setName, Problems.START_EVENT_MULTIPLE_FOUND, 3);
+		problems = findErrors(allErrors, setName, Problems.START_EVENT_MULTIPLE_FOUND, 2);
 		assertCommonProblemFieldForActivity(problems.get(0));
 		assertCommonProblemFieldForActivity(problems.get(1));
-		assertCommonProblemFieldForActivity(problems.get(2));
 		problems = findErrors(allErrors, setName, Problems.START_EVENT_INVALID_EVENT_DEFINITION, 1);
 		assertCommonProblemFieldForActivity(problems.get(0));
 		
@@ -267,7 +266,7 @@ public class DefaultProcessValidatorTest {
 	}
 	
 	/*
-	 * Test for https://jira.codehaus.org/browse/ACT-2071:
+	 * Test for https://activiti.atlassian.net/browse/ACT-2071:
 	 * 
 	 * If all processes in a deployment are not executable, throw an exception
 	 * as this doesn't make sense to do.
@@ -286,7 +285,7 @@ public class DefaultProcessValidatorTest {
 	}
 	
 	/*
-	 * Test for https://jira.codehaus.org/browse/ACT-2071:
+	 * Test for https://activiti.atlassian.net/browse/ACT-2071:
 	 * 
 	 * If there is at least one process definition which is executable, 
 	 * and the deployment contains other process definitions which are not executable,

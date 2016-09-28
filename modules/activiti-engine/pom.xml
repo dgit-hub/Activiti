@@ -10,7 +10,7 @@
     <groupId>org.activiti</groupId>
     <artifactId>activiti-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>5.16.3</version>
+    <version>5.21.0</version>
   </parent>
 
   <dependencies>
@@ -73,7 +73,11 @@
       <artifactId>geronimo-jta_1.1_spec</artifactId>
       <scope>provided</scope>
     </dependency>
-    
+    <dependency>
+      <groupId>javax.enterprise.concurrent</groupId>
+      <artifactId>javax.enterprise.concurrent-api</artifactId>
+      <scope>provided</scope>
+  	</dependency>
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
@@ -100,7 +104,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>postgresql</groupId>
+      <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <scope>test</scope>
     </dependency>
@@ -173,6 +177,7 @@
       org.drools*;resolution:=optional,
       com.fasterxml*;resolution:=optional,
       javax.transaction;resolution:=optional,
+      javax.enterprise.concurrent;resolution:=optional,
     </activiti.osgi.import.additional>
   </properties>
 
@@ -186,7 +191,6 @@
             <exclude>**/RepeatingServiceTaskTest.java</exclude>
           </excludes>
           <runOrder>alphabetical</runOrder>
-          <argLine>-Duser.language=en</argLine>
         </configuration>
       </plugin>
       <plugin>
@@ -367,6 +371,57 @@
     </profile>
     
     <profile>
+      <id>databasewithschema</id>
+      <activation>
+        <property>
+          <name>databasewithschema</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <!--
+              only worked with this version, there might be a bug with antrun
+              see http://jira.codehaus.org/browse/MANTRUN-109
+            -->
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <id>database-test-create-schema</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <echo message="updating activiti configuration to db ${databasewithschema}" />
+                    <copy file="${basedir}/../../qa/db/schema/activiti.cfg.xml" todir="target/test-classes" overwrite="true">
+                      <filterset filtersfile="${user.home}/.activiti/jdbc/build.${databasewithschema}.properties" />
+                    </copy>
+                  </tasks>
+                </configuration>
+              </execution>
+              <execution>
+                <id>database-test-drop-schema</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <echo message="dropping schema in ${databasewithschema}" />
+                    <java classname="org.activiti.engine.impl.db.DbSchemaDrop" classpathref="maven.test.classpath" />
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <profile>
       <id>databasemssql</id>
       <activation>
         <property>
@@ -450,7 +505,6 @@
           <plugin>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <encoding>UTF-8</encoding>
               <excludes>
                 <exclude>**/*TestCase.java</exclude>
                 
@@ -459,7 +513,6 @@
                 <exclude>org/activiti/standalone/**</exclude>
               </excludes>
               <runOrder>alphabetical</runOrder>
-              <argLine>-Duser.language=en</argLine>
             </configuration>
           </plugin>
         </plugins>
@@ -525,7 +578,6 @@
 							<exclude>org/activiti/standalone/**</exclude>
 						</excludes>
 						<runOrder>alphabetical</runOrder>
-            <argLine>-Duser.language=en</argLine>
 					</configuration>
 				</plugin>
 			</plugins>
@@ -569,15 +621,14 @@
             <configuration>
               <excludes>
                 <exclude>**/*TestCase.java</exclude>
-                <exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-234 -->
-                <exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
-                <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
-                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485  -->
+                <exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-234 -->
+                <exclude>**/WSDLImporterTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-315 -->
+                <exclude>**/JobExecutorTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-427 -->
+                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-485  -->
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                 <exclude>org/activiti/standalone/**</exclude>
               </excludes>
               <runOrder>alphabetical</runOrder>
-              <argLine>-Duser.language=en</argLine>
             </configuration>
           </plugin>
         </plugins>
@@ -660,15 +711,14 @@
             <configuration>
               <excludes>
                 <exclude>**/*TestCase.java</exclude>
-                <exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-234 -->
-                <exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
-                <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
-                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485  -->
+                <exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-234 -->
+                <exclude>**/WSDLImporterTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-315 -->
+                <exclude>**/JobExecutorTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-427 -->
+                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-485  -->
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                 <exclude>org/activiti/standalone/**</exclude>
               </excludes>
               <runOrder>alphabetical</runOrder>
-              <argLine>-Duser.language=en</argLine>
             </configuration>
           </plugin>
         </plugins>
@@ -704,18 +754,21 @@
             <configuration>
               <excludes>
                 <exclude>**/*TestCase.java</exclude>
-                <exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-234 -->
-                <exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
-                <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
-                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485  -->
+                <exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-234 -->
+                <exclude>**/WSDLImporterTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-315 -->
+                <exclude>**/JobExecutorTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-427 -->
+                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-485  -->
                 <exclude>**/Historic*InstanceTest.java</exclude>
                 <exclude>**/HistoryServiceTest.java</exclude>
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                 <exclude>**/ProcessInstanceLogQueryTest.java</exclude>
                 <exclude>org/activiti/standalone/**</exclude>
+                <exclude>**/HistoricProcessInstanceQueryVersionTest.java</exclude>
+                <exclude>**/NonCascadeDeleteTest.java</exclude>
+                <exclude>**/HistoricProcessInstanceQueryAndWithExceptionTest.java</exclude>
+                <exclude>**/HistoricJPAVariableTest.java</exclude>
               </excludes>
               <runOrder>alphabetical</runOrder>
-              <argLine>-Duser.language=en</argLine>
             </configuration>
           </plugin>
         </plugins>
@@ -739,7 +792,6 @@
               </includes>
               <excludes />
               <runOrder>alphabetical</runOrder>
-              <argLine>-Duser.language=en</argLine>
             </configuration>
           </plugin>
           <plugin>
@@ -807,6 +859,23 @@
     </profile>
     
     <profile>
+      <id>oraclewithschema</id>
+      <activation>
+        <property>
+          <name>databasewithschema</name>
+          <value>oracle</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.oracle.jdbc</groupId>
+          <artifactId>ojdbc5</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    
+    <profile>
       <id>db2</id>
       <activation>
         <property>
@@ -852,6 +921,23 @@
         <dependency>
           <groupId>mysql</groupId>
           <artifactId>mysql-connector-java</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>hsql</id>
+      <activation>
+        <property>
+          <name>database</name>
+          <value>hsql</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.hsqldb</groupId>
+          <artifactId>hsqldb</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>

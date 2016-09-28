@@ -26,12 +26,12 @@ import org.activiti.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.test.Deployment;
-import org.activiti.rest.service.BaseRestTestCase;
+import org.activiti.rest.service.BaseSpringRestTestCase;
 import org.activiti.rest.service.api.RestUrls;
 import org.apache.commons.lang3.StringUtils;
-import org.restlet.data.Status;
-import org.restlet.representation.Representation;
-import org.restlet.resource.ClientResource;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -43,7 +43,7 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
  * 
  * @author Tijs Rademakers
  */
-public class HistoricTaskInstanceCollectionResourceTest extends BaseRestTestCase {
+public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTestCase {
   
   protected ISO8601DateFormat dateFormat = new ISO8601DateFormat();
   
@@ -63,7 +63,7 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseRestTestCase
     created.set(Calendar.MILLISECOND, 0);
     processEngineConfiguration.getClock().setCurrentTime(created.getTime());
     
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", processVariables);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", "testBusinessKey", processVariables);
     processEngineConfiguration.getClock().reset();
     Task task1 = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     taskService.complete(task1.getId());
@@ -81,6 +81,24 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseRestTestCase
     String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_TASK_INSTANCES);
     
     assertResultsPresentInDataResponse(url, 3, task.getId(), task2.getId());
+    
+    
+    assertResultsPresentInDataResponse(url + "?processDefinitionName=" + "The%20One%20Task%20Process", 3, task.getId());
+
+    assertResultsPresentInDataResponse(url + "?processDefinitionNameLike=" + "The%25", 3, task.getId());
+ 
+    assertResultsPresentInDataResponse(url + "?processDefinitionKey=" + "oneTaskProcess", 3, task.getId());
+
+    assertResultsPresentInDataResponse(url + "?processDefinitionKeyLike=" + "oneTask%25", 3, task.getId());
+    
+    assertResultsPresentInDataResponse(url + "?taskMinPriority=" + "0", 3, task.getId());
+
+    assertResultsPresentInDataResponse(url + "?taskMaxPriority=" + "60", 3, task.getId());
+
+    assertResultsPresentInDataResponse(url + "?processBusinessKey=" + "testBusinessKey", 2, task.getId());
+    
+    assertResultsPresentInDataResponse(url + "?processBusinessKeyLike=" + "testBusin%25", 2, task.getId());
+    
     
     assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId(), 2, task.getId());
     
@@ -129,12 +147,11 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseRestTestCase
   protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String... expectedTaskIds) throws JsonProcessingException, IOException {
     
     // Do the actual call
-    ClientResource client = getAuthenticatedClient(url);
-    Representation response = client.get();
+  	CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
     
     // Check status and size
-    assertEquals(Status.SUCCESS_OK, client.getResponse().getStatus());
-    JsonNode dataNode = objectMapper.readTree(response.getStream()).get("data");
+    JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
+    closeResponse(response);
     assertEquals(numberOfResultsExpected, dataNode.size());
 
     // Check presence of ID's
@@ -147,7 +164,5 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseRestTestCase
       }
       assertTrue("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
     }
-    
-    client.release();
   }
 }

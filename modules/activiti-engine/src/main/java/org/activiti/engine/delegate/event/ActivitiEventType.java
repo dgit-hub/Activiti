@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.history.HistoricActivityInstance;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -107,7 +109,12 @@ public enum ActivitiEventType {
    * An activity has been completed successfully.
    */
   ACTIVITY_COMPLETED,
-  
+
+  /**
+   * An activity has been cancelled because of boundary event.
+   */
+  ACTIVITY_CANCELLED,
+
   /**
    * An activity has received a signal. Dispatched after the activity has responded to the signal.
    */
@@ -134,10 +141,27 @@ public enum ActivitiEventType {
   ACTIVITY_ERROR_RECEIVED,
   
   /**
-   * An activity was interrupted by an interrupting timer boundary event.
+   * A event dispatched when a {@link HistoricActivityInstance} is created. 
+   * This is a specialized version of the {@link ActivitiEventType#ENTITY_CREATED} and {@link ActivitiEventType#ENTITY_INITIALIZED} event,
+   * with the same use case as the {@link ActivitiEventType#ACTIVITY_STARTED}, but containing
+   * slightly different data.
+   * 
+   * Note this will be an {@link ActivitiEntityEvent}, where the entity is the {@link HistoricActivityInstance}.
+   *  
+   * Note that history (minimum level ACTIVITY) must be enabled to receive this event.  
    */
-  ACTIVITY_TIMEOUT,
+  HISTORIC_ACTIVITY_INSTANCE_CREATED,
   
+  /**
+   * A event dispatched when a {@link HistoricActivityInstance} is marked as ended. 
+   * his is a specialized version of the {@link ActivitiEventType#ENTITY_UPDATED} event,
+   * with the same use case as the {@link ActivitiEventType#ACTIVITY_COMPLETED}, but containing
+   * slightly different data (e.g. the end time, the duration, etc.). 
+   *  
+   * Note that history (minimum level ACTIVITY) must be enabled to receive this event.  
+   */
+  HISTORIC_ACTIVITY_INSTANCE_ENDED,
+
   /**
    * Indicates the engine has taken (ie. followed) a sequenceflow from a source activity to a target activity.
    */
@@ -181,11 +205,51 @@ public enum ActivitiEventType {
    */
   TASK_COMPLETED,
 
+    /**
+     * A process instance has been started. Dispatched when starting a process instance previously created. The event
+     * PROCESS_STARTED is dispatched after the associated event ENTITY_INITIALIZED.
+     */
+  PROCESS_STARTED,
+
   /**
    * A process has been completed. Dispatched after the last activity is ACTIVITY_COMPLETED. Process is completed
    * when it reaches state in which process instance does not have any transition to take.
    */
   PROCESS_COMPLETED,
+  
+  /**
+   * A process has been completed with an error end event.
+   */
+  PROCESS_COMPLETED_WITH_ERROR_END_EVENT,
+
+  /**
+   * A process has been cancelled. Dispatched when process instance is deleted by
+   * @see org.activiti.engine.impl.RuntimeServiceImpl#deleteProcessInstance(java.lang.String, java.lang.String), before
+   * DB delete.
+   */
+  PROCESS_CANCELLED,
+  
+  /**
+   * A event dispatched when a {@link HistoricProcessInstance} is created. 
+   * This is a specialized version of the {@link ActivitiEventType#ENTITY_CREATED} and {@link ActivitiEventType#ENTITY_INITIALIZED} event,
+   * with the same use case as the {@link ActivitiEventType#PROCESS_STARTED}, but containing
+   * slightly different data (e.g. the start time, the start user id, etc.). 
+   * 
+   * Note this will be an {@link ActivitiEntityEvent}, where the entity is the {@link HistoricProcessInstance}.
+   *  
+   * Note that history (minimum level ACTIVITY) must be enabled to receive this event.  
+   */
+  HISTORIC_PROCESS_INSTANCE_CREATED,
+  
+  /**
+   * A event dispatched when a {@link HistoricProcessInstance} is marked as ended. 
+   * his is a specialized version of the {@link ActivitiEventType#ENTITY_UPDATED} event,
+   * with the same use case as the {@link ActivitiEventType#PROCESS_COMPLETED}, but containing
+   * slightly different data (e.g. the end time, the duration, etc.). 
+   *  
+   * Note that history (minimum level ACTIVITY) must be enabled to receive this event.  
+   */
+  HISTORIC_PROCESS_INSTANCE_ENDED,
 
   /**
    * A new membership has been created.

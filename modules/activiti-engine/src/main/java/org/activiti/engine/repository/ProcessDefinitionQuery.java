@@ -13,6 +13,8 @@
 
 package org.activiti.engine.repository;
 
+import java.util.Set;
+
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.query.Query;
 
@@ -28,6 +30,9 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   
   /** Only select process definiton with the given id.  */
   ProcessDefinitionQuery processDefinitionId(String processDefinitionId);
+  
+  /** Only select process definitions with the given ids. */
+  ProcessDefinitionQuery processDefinitionIds(Set<String> processDefinitionIds);
   
   /** Only select process definitions with the given category. */
   ProcessDefinitionQuery processDefinitionCategory(String processDefinitionCategory);
@@ -56,6 +61,9 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
    * given deployment id
    */
   ProcessDefinitionQuery deploymentId(String deploymentId);
+  
+  /** Select process definitions that are deployed in deployments with the given set of ids */
+  ProcessDefinitionQuery deploymentIds(Set<String> deploymentIds);
 
   /**
    * Only select process definition with the given key.
@@ -75,10 +83,29 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   ProcessDefinitionQuery processDefinitionVersion(Integer processDefinitionVersion);
   
   /**
+   * Only select process definitions which version are greater than a certain version.
+   */
+  ProcessDefinitionQuery processDefinitionVersionGreaterThan(Integer processDefinitionVersion);
+  
+  /**
+   * Only select process definitions which version are greater than or equals a certain version.
+   */
+  ProcessDefinitionQuery processDefinitionVersionGreaterThanOrEquals(Integer processDefinitionVersion);
+  
+  /**
+   * Only select process definitions which version are lower than a certain version.
+   */
+  ProcessDefinitionQuery processDefinitionVersionLowerThan(Integer processDefinitionVersion);
+  
+  /**
+   * Only select process definitions which version are lower than or equals a certain version.
+   */
+  ProcessDefinitionQuery processDefinitionVersionLowerThanOrEquals(Integer processDefinitionVersion);
+  
+  /**
    * Only select the process definitions which are the latest deployed
    * (ie. which have the highest version number for the given key).
    * 
-   * Can only be used in combination with {@link #processDefinitionKey(String)} of {@link #processDefinitionKeyLike(String)}.
    * Can also be used without any other criteria (ie. query.latest().list()), which
    * will then give all the latest versions of all the deployed process definitions.
    * 

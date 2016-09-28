@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
 /**
  * @author Tijs Rademakers
  */
@@ -30,14 +29,19 @@ public class UserTask extends Task {
   protected String priority;
   protected String formKey;
   protected String dueDate;
+  protected String businessCalendarName;
   protected String category;
+  protected String extensionId;
   protected List<String> candidateUsers = new ArrayList<String>();
   protected List<String> candidateGroups = new ArrayList<String>();
   protected List<FormProperty> formProperties = new ArrayList<FormProperty>();
   protected List<ActivitiListener> taskListeners = new ArrayList<ActivitiListener>();
-  
+  protected String skipExpression;
+
   protected Map<String, Set<String>> customUserIdentityLinks = new HashMap<String, Set<String>>(); 
-  protected Map<String, Set<String>> customGroupIdentityLinks = new HashMap<String, Set<String>>(); 
+  protected Map<String, Set<String>> customGroupIdentityLinks = new HashMap<String, Set<String>>();
+  
+  protected List<CustomProperty> customProperties = new ArrayList<CustomProperty>();
 
   public String getAssignee() {
     return assignee;
@@ -69,12 +73,30 @@ public class UserTask extends Task {
   public void setDueDate(String dueDate) {
     this.dueDate = dueDate;
   }
+
+  public String getBusinessCalendarName() {
+    return businessCalendarName;
+  }
+
+  public void setBusinessCalendarName(String businessCalendarName) {
+    this.businessCalendarName = businessCalendarName;
+  }
+
   public String getCategory() {
 		return category;
 	}
 	public void setCategory(String category) {
 		this.category = category;
 	}
+	public String getExtensionId() {
+    return extensionId;
+  }
+  public void setExtensionId(String extensionId) {
+    this.extensionId = extensionId;
+  }
+  public boolean isExtended() {
+    return extensionId != null && !extensionId.isEmpty();
+  }
 	public List<String> getCandidateUsers() {
     return candidateUsers;
   }
@@ -135,11 +157,24 @@ public class UserTask extends Task {
 	return customGroupIdentityLinks;
   }
   
-  public void setCustomGroupIdentityLinks(
-		Map<String, Set<String>> customGroupIdentityLinks) {
-	this.customGroupIdentityLinks = customGroupIdentityLinks;
+  public void setCustomGroupIdentityLinks(Map<String, Set<String>> customGroupIdentityLinks) {
+    this.customGroupIdentityLinks = customGroupIdentityLinks;
   }
   
+  public List<CustomProperty> getCustomProperties() {
+    return customProperties;
+  }
+  public void setCustomProperties(List<CustomProperty> customProperties) {
+    this.customProperties = customProperties;
+  }
+  
+  public String getSkipExpression() {
+    return skipExpression;
+  }
+  
+  public void setSkipExpression(String skipExpression) {
+    this.skipExpression = skipExpression;
+  }
   public UserTask clone() {
     UserTask clone = new UserTask();
     clone.setValues(this);
@@ -154,6 +189,8 @@ public class UserTask extends Task {
     setDueDate(otherElement.getDueDate());
     setPriority(otherElement.getPriority());
     setCategory(otherElement.getCategory());
+    setExtensionId(otherElement.getExtensionId());
+    setSkipExpression(otherElement.getSkipExpression());
     
     setCandidateGroups(new ArrayList<String>(otherElement.getCandidateGroups()));
     setCandidateUsers(new ArrayList<String>(otherElement.getCandidateUsers()));

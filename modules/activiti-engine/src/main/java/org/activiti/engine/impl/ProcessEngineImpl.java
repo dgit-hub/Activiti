@@ -14,6 +14,7 @@ package org.activiti.engine.impl;
 
 import java.util.Map;
 
+import org.activiti.engine.DynamicBpmnService;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
@@ -25,6 +26,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
+import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.cfg.TransactionContextFactory;
 import org.activiti.engine.impl.el.ExpressionManager;
@@ -49,7 +51,9 @@ public class ProcessEngineImpl implements ProcessEngine {
   protected TaskService taskService;
   protected FormService formService;
   protected ManagementService managementService;
+  protected DynamicBpmnService dynamicBpmnService;
   protected JobExecutor jobExecutor;
+  protected AsyncExecutor asyncExecutor;
   protected CommandExecutor commandExecutor;
   protected Map<Class<?>, SessionFactory> sessionFactories;
   protected ExpressionManager expressionManager;
@@ -66,7 +70,9 @@ public class ProcessEngineImpl implements ProcessEngine {
     this.taskService = processEngineConfiguration.getTaskService();
     this.formService = processEngineConfiguration.getFormService();
     this.managementService = processEngineConfiguration.getManagementService();
+    this.dynamicBpmnService = processEngineConfiguration.getDynamicBpmnService();
     this.jobExecutor = processEngineConfiguration.getJobExecutor();
+    this.asyncExecutor = processEngineConfiguration.getAsyncExecutor();
     this.commandExecutor = processEngineConfiguration.getCommandExecutor();
     this.sessionFactories = processEngineConfiguration.getSessionFactories();
     this.transactionContextFactory = processEngineConfiguration.getTransactionContextFactory();
@@ -81,10 +87,14 @@ public class ProcessEngineImpl implements ProcessEngine {
     
     ProcessEngines.registerProcessEngine(this);
 
-    if ((jobExecutor != null) && (jobExecutor.isAutoActivate())) {
+    if (jobExecutor != null && jobExecutor.isAutoActivate()) {
       jobExecutor.start();
     }
     
+    if (asyncExecutor != null && asyncExecutor.isAutoActivate()) {
+      asyncExecutor.start();
+    }
+     
     if (processEngineConfiguration.getProcessEngineLifecycleListener() != null) {
       processEngineConfiguration.getProcessEngineLifecycleListener().onProcessEngineBuilt(this);
     }
@@ -95,8 +105,12 @@ public class ProcessEngineImpl implements ProcessEngine {
   
   public void close() {
     ProcessEngines.unregister(this);
-    if ((jobExecutor != null) && (jobExecutor.isActive())) {
+    if (jobExecutor != null && jobExecutor.isActive()) {
       jobExecutor.shutdown();
+    }
+    
+    if (asyncExecutor != null && asyncExecutor.isActive()) {
+      asyncExecutor.shutdown();
     }
 
     commandExecutor.execute(processEngineConfiguration.getSchemaCommandConfig(), new SchemaOperationProcessEngineClose());
@@ -141,6 +155,10 @@ public class ProcessEngineImpl implements ProcessEngine {
   
   public FormService getFormService() {
     return formService;
+  }
+  
+  public DynamicBpmnService getDynamicBpmnService() {
+    return dynamicBpmnService;
   }
 
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {

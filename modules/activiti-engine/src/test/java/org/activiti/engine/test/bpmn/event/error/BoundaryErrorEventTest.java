@@ -18,10 +18,12 @@ import java.util.Map;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.delegate.BpmnError;
+import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
+import org.activiti.engine.impl.util.JvmUtil;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.test.Deployment;
 
@@ -369,11 +371,21 @@ public class BoundaryErrorEventTest extends PluggableActivitiTestCase {
   }
 
   @Deployment(resources = {
-          "org/activiti/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorOnScriptTask.bpmn20.xml"
+          "org/activiti/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorOnGroovyScriptTask.bpmn20.xml"
   })
-  public void testCatchErrorOnScriptTask() {
+  public void testCatchErrorOnGroovyScriptTask() {
       String procId = runtimeService.startProcessInstanceByKey("catchErrorOnScriptTask").getId();
       assertProcessEnded(procId);
+  }
+  
+  @Deployment(resources = {
+          "org/activiti/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorOnJavaScriptScriptTask.bpmn20.xml"
+  })
+  public void testCatchErrorOnJavaScriptScriptTask() {
+  	if (JvmUtil.isAtLeastJDK7()) {
+  		String procId = runtimeService.startProcessInstanceByKey("catchErrorOnScriptTask").getId();
+  		assertProcessEnded(procId);
+  	}
   }
 
   @Deployment(resources = {
@@ -429,6 +441,14 @@ public class BoundaryErrorEventTest extends PluggableActivitiTestCase {
     // Completing the task will end the process instance
     taskService.complete(task.getId());
     assertProcessEnded(procId);
+    
+    if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+      List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(procId).list();
+      for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
+        assertNotNull("Historic activity " + historicActivityInstance.getActivityName() + " has a null end time, while the process instance is finished",
+            historicActivityInstance.getEndTime());
+      }
+    }
   }
   
   @Deployment

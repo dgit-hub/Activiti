@@ -77,7 +77,7 @@ public interface Messages {
   String PROFILE_LOCATION = "profile.location";
   String PROFILE_CONTACT = "profile.contact";
   String PROFILE_EMAIL = "profile.email";
-  String PROFILE_PHONE = "profile.phone";;
+  String PROFILE_PHONE = "profile.phone";
   String PROFILE_TWITTER = "profile.twitter";
   String PROFILE_SKYPE = "profile.skype";
   String PROFILE_ACCOUNTS = "profile.accounts";
@@ -291,6 +291,7 @@ public interface Messages {
   String REPORTING_SAVE_POPUP_NAME_EXISTS = "reporting.save.popup.name.exists";
   String REPORTING_SAVE_POPUP_NAME_TOO_LONG = "reporting.save.popup.name.too.long";
   String REPORTING_CREATE_TIME = "reporting.report.created";
+  String REPORTING_GENERATE_REPORT = "reporting.generatereport";
   
   // Management menu
   String MGMT_MENU_DATABASE = "management.menu.database";
@@ -438,7 +439,7 @@ public interface Messages {
   
   String RELATED_CONTENT_TYPE_URL = "related.content.type.url";
   String RELATED_CONTENT_TYPE_URL_URL = "related.content.type.url.url";
-  String RELATED_CONTENT_TYPE_URL_URL_REQUIRED = "related.content.type.url.url.required";;
+  String RELATED_CONTENT_TYPE_URL_URL_REQUIRED = "related.content.type.url.url.required";
   String RELATED_CONTENT_TYPE_URL_HELP = "related.content.type.url.help";
   
   String RELATED_CONTENT_TYPE_FILE = "related.content.type.file";

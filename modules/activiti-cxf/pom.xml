@@ -10,7 +10,7 @@
     <groupId>org.activiti</groupId>
     <artifactId>activiti-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>5.16.3</version>
+    <version>5.21.0</version>
   </parent>
   
   <properties>
@@ -132,10 +132,6 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>xerces</groupId>
-      <artifactId>xercesImpl</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <scope>test</scope>
@@ -160,6 +156,11 @@
       <artifactId>servlet-api</artifactId>
       <scope>provided</scope>
     </dependency>
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-log4j12</artifactId>
+         <scope>test</scope>
+      </dependency>
   </dependencies>
 
   <profiles>

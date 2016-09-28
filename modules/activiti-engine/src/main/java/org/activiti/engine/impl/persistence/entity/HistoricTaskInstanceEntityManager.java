@@ -68,7 +68,11 @@ public class HistoricTaskInstanceEntityManager extends AbstractManager {
       int maxResults = historicTaskInstanceQuery.getMaxResults();
       
       // setting max results, limit to 20000 results for performance reasons
-      historicTaskInstanceQuery.setMaxResults(20000);
+      if (historicTaskInstanceQuery.getTaskVariablesLimit() != null) {
+        historicTaskInstanceQuery.setMaxResults(historicTaskInstanceQuery.getTaskVariablesLimit());
+      } else {
+        historicTaskInstanceQuery.setMaxResults(Context.getProcessEngineConfiguration().getHistoricTaskQueryLimit());
+      }
       historicTaskInstanceQuery.setFirstResult(0);
       
       List<HistoricTaskInstance> instanceList = getDbSqlSession().selectListWithRawParameterWithoutFilter("selectHistoricTaskInstancesWithVariablesByQueryCriteria", 
@@ -101,11 +105,21 @@ public class HistoricTaskInstanceEntityManager extends AbstractManager {
     return null;
   }
   
+  @SuppressWarnings("unchecked")
+  public List<HistoricTaskInstance> findHistoricTasksByParentTaskId(String parentTaskId) {
+    return getDbSqlSession().selectList("selectHistoricTasksByParentTaskId", parentTaskId);
+  }
+  
   public void deleteHistoricTaskInstanceById(String taskId) {
     if (getHistoryManager().isHistoryEnabled()) {
       HistoricTaskInstanceEntity historicTaskInstance = findHistoricTaskInstanceById(taskId);
-      if(historicTaskInstance!=null) {
+      if (historicTaskInstance != null) {
         CommandContext commandContext = Context.getCommandContext();
+        
+        List<HistoricTaskInstance> subTasks = findHistoricTasksByParentTaskId(taskId);
+        for (HistoricTaskInstance subTask: subTasks) {
+          deleteHistoricTaskInstanceById(subTask.getId());
+        }
         
         commandContext
           .getHistoricDetailEntityManager()
