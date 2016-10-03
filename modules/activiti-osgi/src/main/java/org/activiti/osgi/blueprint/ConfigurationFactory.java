@@ -63,7 +63,7 @@ public class ConfigurationFactory {
         this.customMybatisMappers = customMybatisMappers;
     }
 
-    public List<String> getCustomEventHandlers() {
+    public List<EventHandler> getCustomEventHandlers() {
         return customEventHandlers;
     }
 
