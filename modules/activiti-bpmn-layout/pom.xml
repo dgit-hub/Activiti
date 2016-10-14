@@ -47,6 +47,11 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+        	<instructions>
+        		<Export-Package>org.activiti.bpmn,*</Export-Package>
+        	</instructions>
+        </configuration>
       </plugin>
     </plugins>
     <pluginManagement>

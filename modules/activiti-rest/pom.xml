@@ -56,6 +56,15 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+	        <instructions>
+	          <Export-Package>
+	          org.activiti.rest.form,
+	          org.activiti.rest.security,
+	          *
+	          </Export-Package>
+	        </instructions>
+        </configuration>
       </plugin>
     </plugins>
     <pluginManagement>
