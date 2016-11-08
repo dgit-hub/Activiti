@@ -8,6 +8,7 @@ import org.activiti.engine.cfg.ProcessEngineConfigurator;
 import org.activiti.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
 import org.activiti.engine.parse.BpmnParseHandler;
 import org.activiti.engine.impl.event.EventHandler;
+import org.activiti.engine.delegate.event.ActivitiEventListener;
 
 public class ConfigurationFactory {
 
@@ -18,7 +19,7 @@ public class ConfigurationFactory {
     List<BpmnParseHandler> customDefaultBpmnParseHandlers;
     ActivityBehaviorFactory activityBehaviorFactory;
     protected Set<Class<?>> customMybatisMappers;
-    protected List<EventHandler> customEventHandlers;
+    protected List<ActivitiEventListener> customEventListeners;
 
     public StandaloneProcessEngineConfiguration getConfiguration() {
   		StandaloneProcessEngineConfiguration conf =
@@ -30,7 +31,7 @@ public class ConfigurationFactory {
         conf.setCustomDefaultBpmnParseHandlers(customDefaultBpmnParseHandlers);
       conf.setCustomMybatisMappers(customMybatisMappers);
       conf.setActivityBehaviorFactory(activityBehaviorFactory);
-      conf.setCustomEventHandlers(customEventHandlers);
+      conf.setEventListeners(customEventListeners);
       return conf;
     }
 
@@ -63,12 +64,12 @@ public class ConfigurationFactory {
         this.customMybatisMappers = customMybatisMappers;
     }
 
-    public List<EventHandler> getCustomEventHandlers() {
-        return customEventHandlers;
+    public List<ActivitiEventListener> getCustomEventListeners() {
+        return customEventListeners;
     }
 
-    public void setCustomEventHandlers(List<EventHandler> customEventHandlers) {
-        this.customEventHandlers = customEventHandlers;
+    public void setCustomEventListeners(List<ActivitiEventListener> customEventListeners) {
+        this.customEventListeners = customEventListeners;
     }
 
 }
