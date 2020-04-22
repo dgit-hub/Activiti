@@ -5,10 +5,10 @@
   <parent>
     <groupId>org.activiti</groupId>
     <artifactId>archetypes</artifactId>
-    <version>5.21.0</version>
+    <version>5.21.0.dgit-fix-10</version>
   </parent>
 
   <artifactId>activiti-archetype-unittest</artifactId>
   <description>Creates a new Activiti unit test.</description>
-  <packaging>jar</packaging>  
+  <packaging>jar</packaging>
 </project>
